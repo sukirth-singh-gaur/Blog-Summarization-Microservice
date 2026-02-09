@@ -8,6 +8,4 @@ def push_blog_id(blog_id: str):
     queue.enqueue(
         summarize_blog,
         blog_id,
-        job_timeout=300,   # optional
-        retry=3            # optional
     )

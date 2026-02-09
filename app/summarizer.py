@@ -1,5 +1,6 @@
 from google import genai
 import os
+import time
 from dotenv import load_dotenv # type: ignore
 from bs4 import BeautifulSoup # type: ignore
 
@@ -8,6 +9,21 @@ load_dotenv()
 apiKey = os.getenv("GEMINI_API_KEY")
 
 client = genai.Client(api_key=apiKey)
+
+# --- Simple token-bucket rate limit (Gemini) ---
+MAX_CALLS = 30        # per minute
+WINDOW = 60
+_calls = []
+
+def _rate_limit():
+    now = time.time()
+    while _calls and _calls[0] < now - WINDOW:
+        _calls.pop(0)
+    if len(_calls) >= MAX_CALLS:
+        sleep_for = WINDOW - (now - _calls[0])
+        time.sleep(max(sleep_for, 0))
+    _calls.append(time.time())
+
 
 def truncate_text(text: str, max_chars: int = 1000) -> str:
     return text[:max_chars]
@@ -23,6 +39,7 @@ def extract_text_from_html(html: str) -> str:
     return " ".join(text.split())
 
 def generate_summary(content : str) -> str:
+    _rate_limit()
     clean_text = extract_text_from_html(content)
     clean_text = truncate_text(clean_text)
     if len(clean_text) < 200:
@@ -38,7 +55,7 @@ def generate_summary(content : str) -> str:
     model="gemini-2.5-flash-lite",
     contents=prompt
     )
-    return response.text;
+    return response.text.strip();
 
 # content = """
 #     Hello this is a text

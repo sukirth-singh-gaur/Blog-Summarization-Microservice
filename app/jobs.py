@@ -10,11 +10,22 @@ def summarize_blog(blog_id: str):
 
     if not blog:
         raise ValueError("Blog not found")
+    
+    status = blog.get("summaryStatus")
 
-    if blog.get("summaryStatus") == "COMPLETED":
+    if status == "COMPLETED":
         logging.info("Summary already completed")
         return
 
+    if status == "PROCESSING":
+        logging.info("Summary already in progress")
+        return
+    
+    blogs_collection.update_one(
+        {"_id": blog["_id"]},
+        {"$set": {"summaryStatus": "PROCESSING"}},
+    )
+    
     logging.info("Generating summary...")
 
     try:
@@ -38,3 +49,4 @@ def summarize_blog(blog_id: str):
             {"$set": {"summaryStatus": "FAILED"}}
         )
         raise
+

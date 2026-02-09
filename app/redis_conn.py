@@ -9,11 +9,9 @@ redis_conn = redis.Redis(
     port=os.getenv("REDIS_PORT"),   
     username="default",
     password=os.getenv("REDIS_PASSWORD"),
-    decode_responses=True,                 
+    decode_responses=False,                 
 )
 
 redis_conn.ping()                                 
 print("Redis connected!")
 
-redis_conn.set("foo", "bar")
-print(redis_conn.get("foo"))

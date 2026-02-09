@@ -1,5 +1,5 @@
 from app.producer import push_blog_id
 
 if __name__ == "__main__":
-    push_blog_id("68ce403c996bb81ef54a1cc4")
+    push_blog_id("Job_id")
     print("Job enqueued")

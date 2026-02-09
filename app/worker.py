@@ -1,5 +1,7 @@
-from rq import Worker, Queue
+from rq import Worker, Queue#type:ignore
 from app.redis_conn import redis_conn
+import os
+os.environ["GRPC_ENABLE_FORK_SUPPORT"] = "0"
 
 listen = ["blog-summary"]
 
